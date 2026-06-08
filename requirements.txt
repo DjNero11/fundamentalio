@@ -1,0 +1,16 @@
+Django==6.0.3
+python-dotenv==1.2.1
+django-tailwind==4.4.2
+requests==2.32.5
+markdown==3.10.2
+bleach==6.3.0
+openai==2.29.0
+tavily-python==0.7.23
+pymupdf4llm==0.1.9
+yfinance==1.2.2
+pandas==3.0.2
+uvicorn==0.46.0
+gunicorn==26.0.0
+uvicorn-worker==0.4.0
+whitenoise==6.11.0
+django-browser-reload==1.21.0

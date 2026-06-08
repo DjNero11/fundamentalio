@@ -1,0 +1,35 @@
+---
+description: 
+alwaysApply: true
+---
+
+1. Always follow Django best practices
+2. Always follow web security best practices
+3. The code you create must be suitable for production usage
+4. Every time you create new functionality follow test-driven development:
+    - Write only the **minimum necessary tests** that protect real functional behavior.
+    - Avoid duplicate tests across views, forms, templates etc. for the same behavior
+    - IMPORTANT for mock testing: Always patch objects where they are USED, not where they are defined.
+5. Use Tailwind CSS for styling
+6. Use Alpine.js for UI only when Tailwind CSS cannot handle the logic. Do not use vanilla JS if the same behavior can be expressed cleanly in Alpine.
+7. All pages you create must be fully responsive and mobile friendly.
+8. When you make terminal commands do not forget "source /Users/szymon/Documents/Visual_Studio_Code_Pliki/project/venv/bin/activate"
+9. I am a Django beginner. Suggest easier, more maintainable, or more secure approaches when appropriate.
+10. Do not hard-code URLs wherever possible.
+11. Avoid fix-fail loops:
+    - If a test fails while trying to fix code, you may attempt to fix it **up to 4 times**.
+    - If the same test fails on the 4th attempt, **stop** and ask me for guidance before trying again.
+    - When asking for help, provide:
+        1. The test that failed.
+        2. The code you attempted.
+        3. Any relevant error messages.
+    - Do not continue guessing fixes beyond this limit to prevent excessive token usage.
+12. Keep views.py focused on HTTP handling. Move complex workflows, multi-model database operations, external API calls, and reusable business logic into services
+13. Use Python logging properly:
+    - Always use logging module (never print)
+    - Use INFO, WARNING, ERROR (no DEBUG)
+    - Use logger.exception() in except blocks (includes stack trace)
+    - Use logger.error() for non-exception errors
+    - Log key business events in services and critical workflows
+    - Avoid noisy logging
+    - Never log sensitive data (passwords, tokens, personal data)

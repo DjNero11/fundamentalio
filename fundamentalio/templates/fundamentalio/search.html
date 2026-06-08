@@ -1,0 +1,427 @@
+{% extends 'fundamentalio/base.html' %}
+
+{% block title %}Search Companies{% endblock %}
+
+{% block content %}
+{% url 'fundamentalio:api_search' as api_search_url %}
+{% url 'fundamentalio:api_report_start' as api_report_start_url %}
+
+<section
+    id="search-root"
+    x-data="searchCompanies()"
+    x-init="apiUrl = $el.dataset.apiUrl || ''; reportStartUrl = $el.dataset.reportStartUrl || ''"
+    data-api-url="{{ api_search_url }}"
+    data-report-start-url="{{ api_report_start_url }}"
+    class="w-full max-w-4xl mx-auto"
+    @click.outside="closePanel(false)"
+    @keydown.window.escape="closePanel(false)"
+>
+    <div class="bg-white shadow-xl rounded-3xl border border-gray-200 px-6 py-6 sm:px-10 sm:py-8">
+        <h1 class="text-3xl sm:text-4xl font-semibold text-gray-900 text-center mb-3">
+            Search companies
+        </h1>
+        <p class="text-sm text-gray-500 text-center mb-6">
+            Type a company name or ticker symbol and press Enter or click the search icon.
+        </p>
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-5">
+            <div class="flex items-center justify-center sm:justify-start">
+                <div class="inline-flex rounded-full border border-gray-200 bg-gray-50 p-1">
+                    <button
+                        type="button"
+                        class="px-4 py-2 text-sm rounded-full transition-colors cursor-pointer"
+                        :class="mode === 'quick' ? 'bg-gray-900 text-white shadow' : 'text-gray-700 hover:bg-white'"
+                        @click="mode = 'quick'"
+                        data-testid="mode-quick"
+                    >
+                        Quick Research
+                    </button>
+                    <button
+                        type="button"
+                        class="px-4 py-2 text-sm rounded-full transition-colors cursor-pointer"
+                        :class="mode === 'deep' ? 'bg-gray-900 text-white shadow' : 'text-gray-700 hover:bg-white'"
+                        @click="mode = 'deep'"
+                        data-testid="mode-deep"
+                    >
+                        Deep Research
+                    </button>
+                </div>
+            </div>
+            <div class="text-center sm:text-right text-xs text-gray-500">
+                Selected: <span class="font-medium text-gray-700" x-text="selectedCompany ? selectedCompany.symbol_name : '—'"></span>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 items-stretch">
+            <div class="relative flex-1">
+                <input
+                    id="search-input"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Search by company name or ticker..."
+                    class="w-full rounded-3xl border border-gray-300 bg-white px-5 py-3.5 text-gray-900 shadow-md focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 placeholder:text-gray-400"
+                    x-model="query"
+                    :aria-expanded="panelOpen"
+                    @keydown.enter.prevent="performSearch()"
+                    @input="onInput()"
+                />
+            </div>
+            <button
+                id="search-button"
+                type="button"
+                class="inline-flex items-center justify-center rounded-3xl bg-gray-900 px-6 py-3.5 text-sm font-medium text-white shadow-md hover:bg-gray-800 active:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                aria-label="Search"
+                :disabled="loading"
+                @click="performSearch()"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="6" />
+                    <line x1="16.5" y1="16.5" x2="21" y2="21" />
+                </svg>
+            </button>
+        </div>
+
+        <p id="search-helper" class="mt-2 text-xs text-gray-500" x-text="helperText"></p>
+
+        <div class="mt-5">
+            <div x-show="mode === 'deep'" x-transition class="mb-4">
+                <label class="block text-sm font-medium text-gray-900 mb-2">Annual report (PDF, max 30MB)</label>
+                <div
+                    class="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-4 py-4"
+                    @dragover.prevent
+                    @drop.prevent="onPdfDrop($event)"
+                >
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div class="text-sm text-gray-700">
+                            <span class="font-medium">File:</span>
+                            <span x-text="annualReportFile ? annualReportFile.name : 'None selected'"></span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input
+                                type="file"
+                                accept="application/pdf,.pdf"
+                                class="hidden"
+                                id="annual-report-input"
+                                @change="onPdfPicked($event)"
+                                data-testid="pdf-input"
+                            />
+                            <button
+                                type="button"
+                                class="inline-flex items-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+                                @click="document.getElementById('annual-report-input').click()"
+                            >
+                                Choose PDF
+                            </button>
+                            <button
+                                type="button"
+                                class="inline-flex items-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 cursor-pointer"
+                                @click="annualReportFile = null"
+                                :disabled="!annualReportFile"
+                            >
+                                Clear
+                            </button>
+                        </div>
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500">Tip: you can also drag & drop a PDF here.</p>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="w-full inline-flex items-center justify-center rounded-2xl bg-gray-900 px-6 py-3.5 text-sm font-medium text-white shadow-md hover:bg-gray-800 active:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                :disabled="generating"
+                @click="generateReport()"
+                data-testid="generate-report"
+            >
+                <span x-text="generating ? 'Generating…' : 'Generate report'"></span>
+            </button>
+            <template x-if="generateMessage.text">
+                <div class="mt-3 rounded-xl border px-4 py-3 text-sm"
+                     :class="generateMessage.isError ? 'border-red-200 bg-red-50 text-red-800' : 'border-green-200 bg-green-50 text-green-800'"
+                     x-text="generateMessage.text"></div>
+            </template>
+        </div>
+    </div>
+
+    <div class="mt-4 relative">
+        <div
+            id="results-panel"
+            class="mt-2 w-full rounded-2xl border border-gray-200 bg-white shadow-lg max-h-[420px] overflow-y-auto pb-2 transition-opacity duration-150"
+            :aria-hidden="!panelOpen"
+            x-show="panelOpen"
+            x-transition
+        >
+            <div
+                id="results-header"
+                class="px-4 py-2 text-xs sm:text-sm font-medium text-gray-600 uppercase tracking-wide border-b border-gray-100 bg-gray-50 sticky top-0 z-10"
+                :class="{ 'hidden': !resultsHeaderVisible }"
+            >
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+                    <div>Company Name</div>
+                    <div>Code</div>
+                    <div class="hidden md:block text-right md:text-center">Previous Close</div>
+                    <div class="hidden md:block text-right md:text-center">Currency</div>
+                </div>
+            </div>
+
+            <div id="results-container" class="px-2 pb-1 divide-y divide-gray-100">
+                <template x-if="message.text">
+                    <div
+                        class="rounded-xl border px-4 py-3 text-sm"
+                        :class="message.isError ? 'border-red-200 bg-red-50 text-red-800' : 'border-gray-200 bg-white text-gray-700'"
+                        x-text="message.text"
+                    ></div>
+                </template>
+                <template x-for="item in results" :key="item.code + (item.name || '')">
+                    <div
+                        class="group bg-white px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer focus-within:ring-2 focus-within:ring-gray-900"
+                        role="button"
+                        tabindex="0"
+                        @click="selectItem(item)"
+                        @keydown.enter.prevent="selectItem(item)"
+                        @keydown.space.prevent="selectItem(item)"
+                    >
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 items-center">
+                            <div class="text-sm font-medium text-gray-900" x-text="item.name || ''"></div>
+                            <div class="text-xs sm:text-sm font-mono text-gray-600" x-text="item.code || ''"></div>
+                            <div class="hidden md:block text-sm text-right md:text-center text-gray-900">
+                                <span x-text="item.previous_close != null && !isNaN(Number(item.previous_close)) ? Number(item.previous_close).toFixed(2) : (item.previous_close != null ? '' : '-')"></span>
+                            </div>
+                            <div class="hidden md:block text-xs sm:text-sm text-right md:text-center text-gray-600" x-text="item.currency || ''"></div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-8">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xl sm:text-2xl font-semibold text-gray-900">
+                Recent reports
+            </h2>
+            <a
+                href="{% url 'fundamentalio:history' %}"
+                class="inline-flex items-center rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
+            >
+                More reports
+            </a>
+        </div>
+
+        {% include 'fundamentalio/partials/report_list.html' with reports=recent_reports %}
+        {% if not recent_reports %}
+            <div id="no-reports-placeholder" class="mt-3 rounded-xl border border-dashed border-gray-300 bg-white px-6 py-8 text-center">
+                <p class="text-base font-medium text-gray-900">No reports yet</p>
+                <p class="mt-1 text-sm text-gray-500">
+                    Once you generate reports, they will appear here.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+document.addEventListener('alpine:init', function() {
+    Alpine.data('searchCompanies', function() {
+        return {
+            apiUrl: '',
+            reportStartUrl: '',
+            query: '',
+            loading: false,
+            results: [],
+            selectedCompany: null,
+            mode: 'quick',
+            annualReportFile: null,
+            generating: false,
+            generateMessage: { text: '', isError: false },
+            message: { text: '', isError: false },
+            panelOpen: false,
+            resultsHeaderVisible: false,
+            helperText: '',
+
+            openPanel() {
+                this.panelOpen = true;
+            },
+
+            closePanel(clear) {
+                this.panelOpen = false;
+                if (clear) {
+                    this.results = [];
+                    this.selectedCompany = null;
+                    this.message = { text: '', isError: false };
+                    this.resultsHeaderVisible = false;
+                }
+            },
+
+            onInput() {
+                var value = (this.query || '').trim();
+                if (!value) {
+                    this.helperText = '';
+                    this.closePanel(true);
+                }
+            },
+
+            selectItem(item) {
+                var name = item.name || '';
+                var code = item.code || '';
+                var display = (name && code) ? (name + ' (' + code + ')') : (name || code);
+                this.query = display;
+                this.selectedCompany = {
+                    company_name: name,
+                    symbol_name: code || '',
+                    exchange_code: item.exchange_code || '',
+                };
+                this.$nextTick(function() {
+                    var input = document.getElementById('search-input');
+                    if (input) input.focus();
+                });
+                this.closePanel(false);
+            },
+
+            onPdfPicked(e) {
+                var files = e && e.target ? e.target.files : null;
+                var file = files && files.length ? files[0] : null;
+                this._setAnnualReportFile(file);
+            },
+
+            onPdfDrop(e) {
+                var dt = e && e.dataTransfer ? e.dataTransfer : null;
+                var file = dt && dt.files && dt.files.length ? dt.files[0] : null;
+                this._setAnnualReportFile(file);
+            },
+
+            _setAnnualReportFile(file) {
+                this.generateMessage = { text: '', isError: false };
+                if (!file) {
+                    this.annualReportFile = null;
+                    return;
+                }
+                var name = (file.name || '').toLowerCase();
+                if (!name.endsWith('.pdf')) {
+                    this.generateMessage = { text: 'Only PDF files are allowed.', isError: true };
+                    this.annualReportFile = null;
+                    return;
+                }
+                if (file.size && file.size > 30 * 1024 * 1024) {
+                    this.generateMessage = { text: 'PDF file is too large (max 30MB).', isError: true };
+                    this.annualReportFile = null;
+                    return;
+                }
+                this.annualReportFile = file;
+            },
+
+            _getCookie(name) {
+                var value = '; ' + document.cookie;
+                var parts = value.split('; ' + name + '=');
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return '';
+            },
+
+            generateReport: async function() {
+                this.generateMessage = { text: '', isError: false };
+                if (!this.reportStartUrl) return;
+
+                if (!this.selectedCompany || !this.selectedCompany.symbol_name) {
+                    this.generateMessage = { text: 'Please select a company from the results list first.', isError: true };
+                    return;
+                }
+                if (this.mode === 'deep' && !this.annualReportFile) {
+                    this.generateMessage = { text: 'Please choose an annual report PDF for deep research.', isError: true };
+                    return;
+                }
+
+                var form = new FormData();
+                form.append('mode', this.mode);
+                form.append('company_name', this.selectedCompany.company_name || '');
+                form.append('symbol_name', this.selectedCompany.symbol_name || '');
+                form.append('exchange_code', this.selectedCompany.exchange_code || '');
+                if (this.mode === 'deep' && this.annualReportFile) {
+                    form.append('annual_report_pdf', this.annualReportFile);
+                }
+
+                this.generating = true;
+                try {
+                    var resp = await fetch(this.reportStartUrl, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': this._getCookie('csrftoken'),
+                            'Accept': 'application/json'
+                        },
+                        body: form
+                    });
+                    var data = null;
+                    try { data = await resp.json(); } catch (e) {}
+                    if (!resp.ok) {
+                        var errMsg = (data && data.error) ? data.error : 'Failed to start report generation.';
+                        this.generateMessage = { text: errMsg, isError: true };
+                        return;
+                    }
+                    window.location.reload();
+                } catch (e) {
+                    this.generateMessage = { text: 'Network error while starting report generation.', isError: true };
+                } finally {
+                    this.generating = false;
+                }
+            },
+
+            performSearch: async function() {
+                if (!this.apiUrl) return;
+                var query = (this.query || '').trim();
+                this.helperText = '';
+                if (!query) {
+                    this.helperText = 'Please enter a company name or ticker to search.';
+                    this.closePanel(true);
+                    return;
+                }
+                this.selectedCompany = null;
+                var panel = document.getElementById('results-panel');
+                if (panel) panel.scrollTop = 0;
+                this.helperText = 'Searching…';
+                this.loading = true;
+                this.message = { text: '', isError: false };
+                try {
+                    var response = await fetch(this.apiUrl + '?q=' + encodeURIComponent(query), {
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    var data = null;
+                    try {
+                        data = await response.json();
+                    } catch (e) {}
+                    if (!response.ok) {
+                        var errMsg = (data && data.error) ? data.error : 'Search request failed. Please try again.';
+                        this.message = { text: errMsg, isError: true };
+                        this.results = [];
+                        this.resultsHeaderVisible = false;
+                        this.openPanel();
+                        return;
+                    }
+                    var list = (data && Array.isArray(data.results)) ? data.results : [];
+                    if (!list.length) {
+                        this.resultsHeaderVisible = false;
+                        this.message = {
+                            text: 'No matching companies found. If you believe this is an error, please check Yahoo Finance website and copy the symbol with exchange code, e.g. "XTB.WA".',
+                            isError: false
+                        };
+                        this.results = [];
+                    } else {
+                        this.resultsHeaderVisible = true;
+                        this.message = { text: '', isError: false };
+                        this.results = list;
+                    }
+                    this.openPanel();
+                } catch (err) {
+                    this.message = { text: 'Network error while searching. Please check your connection and try again.', isError: true };
+                    this.results = [];
+                    this.resultsHeaderVisible = false;
+                    this.openPanel();
+                } finally {
+                    this.loading = false;
+                    this.helperText = '';
+                }
+            }
+        };
+    });
+});
+</script>
+{% endblock %}

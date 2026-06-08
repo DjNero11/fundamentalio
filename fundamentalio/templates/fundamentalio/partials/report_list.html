@@ -1,0 +1,123 @@
+{% if reports %}
+<div
+    id="report-list-root"
+    class="space-y-3"
+    x-data="reportListPoller()"
+    x-init="init()"
+    data-status-url="{% url 'fundamentalio:api_report_status' %}"
+>
+    {% for report in reports %}
+        {% if report.status == 'in_process' %}
+            <div
+                data-report-id="{{ report.id }}"
+                data-report-status="{{ report.status }}"
+                data-company-name="{{ report.company_name|escape }}"
+                data-company-symbol="{{ report.company_symbol|escape }}"
+                data-type-display="{{ report.get_type_display|escape }}"
+                data-created-date="{{ report.created_at|date:'d-m-Y' }}"
+                data-detail-url="{% url 'fundamentalio:report_detail' report.id %}"
+                data-testid="report-row report-row-in-process"
+                class="block rounded-xl border border-gray-200 bg-white px-4 py-4 sm:px-5 sm:py-4 shadow-sm cursor-default"
+            >
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base sm:text-lg font-semibold text-gray-900">
+                                {{ report.company_name }}
+                            </h2>
+                        </div>
+                        <div class="mt-1 flex items-center gap-2 text-sm text-gray-500">
+                            <span
+                                class="inline-block h-4 w-4 rounded-full border-2 border-gray-300 border-t-gray-600 animate-spin"
+                                aria-hidden="true"
+                            ></span>
+                            <span data-testid="generating-label">Generating report</span>
+                        </div>
+                        <p class="mt-0.5 text-sm text-gray-400">
+                            {{ report.company_symbol }} · {{ report.get_type_display }}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-gray-400 uppercase tracking-wide">Created</p>
+                        <p class="text-sm font-medium text-gray-700">
+                            {{ report.created_at|date:"d-m-Y" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% elif report.status == 'error' %}
+            <div
+                data-report-id="{{ report.id }}"
+                data-report-status="{{ report.status }}"
+                data-company-name="{{ report.company_name|escape }}"
+                data-company-symbol="{{ report.company_symbol|escape }}"
+                data-type-display="{{ report.get_type_display|escape }}"
+                data-created-date="{{ report.created_at|date:'d-m-Y' }}"
+                data-detail-url="{% url 'fundamentalio:report_detail' report.id %}"
+                data-testid="report-row report-row-error"
+                class="block rounded-xl border border-gray-200 bg-white px-4 py-4 sm:px-5 sm:py-4 shadow-sm cursor-default"
+            >
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-semibold text-gray-900">
+                            {{ report.company_name }}
+                        </h2>
+                        <p class="mt-1 text-sm text-red-400" data-testid="error-label">
+                            error occurred during generation
+                        </p>
+                        <p class="mt-0.5 text-sm text-gray-400">
+                            {{ report.company_symbol }} · {{ report.get_type_display }}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-gray-400 uppercase tracking-wide">Created</p>
+                        <p class="text-sm font-medium text-gray-700">
+                            {{ report.created_at|date:"d-m-Y" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <a
+                href="{% url 'fundamentalio:report_detail' report.id %}"
+                data-report-id="{{ report.id }}"
+                data-report-status="{{ report.status }}"
+                data-company-name="{{ report.company_name|escape }}"
+                data-company-symbol="{{ report.company_symbol|escape }}"
+                data-type-display="{{ report.get_type_display|escape }}"
+                data-created-date="{{ report.created_at|date:'d-m-Y' }}"
+                data-detail-url="{% url 'fundamentalio:report_detail' report.id %}"
+                data-testid="report-row report-row-done"
+                class="block rounded-xl border border-gray-200 bg-white px-4 py-4 sm:px-5 sm:py-4 shadow-sm hover:shadow-md transition-shadow"
+            >
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-base sm:text-lg font-semibold text-gray-900">
+                                {{ report.company_name }}
+                            </h2>
+                            {% if not report.read %}
+                                <span
+                                    class="inline-flex h-2 w-2 rounded-full bg-blue-500"
+                                    aria-hidden="true"
+                                    data-testid="unread-dot">
+                                </span>
+                            {% endif %}
+                        </div>
+                        <p class="mt-0.5 text-sm text-gray-500">
+                            {{ report.company_symbol }} · {{ report.get_type_display }}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-gray-400 uppercase tracking-wide">Created</p>
+                        <p class="text-sm font-medium text-gray-700">
+                            {{ report.created_at|date:"d-m-Y" }}
+                        </p>
+                    </div>
+                </div>
+            </a>
+        {% endif %}
+    {% endfor %}
+</div>
+{% include 'fundamentalio/partials/report_list_poller.html' %}
+{% endif %}

@@ -1,0 +1,55 @@
+{% extends 'fundamentalio/base.html' %}
+
+{% block title %}Report History{% endblock %}
+
+{% block content %}
+<section class="w-full max-w-4xl mx-auto">
+    <div class="mb-6">
+        <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">Report History</h1>
+        <p class="mt-1 text-sm text-gray-500">
+            All reports you have created, from newest to oldest.
+        </p>
+    </div>
+
+    {% if page_obj.object_list %}
+        {% include 'fundamentalio/partials/report_list.html' with reports=page_obj.object_list %}
+
+        <div class="mt-6 flex items-center justify-between text-sm text-gray-600">
+            <div>
+                Page {{ page_obj.number }} of {{ paginator.num_pages }}
+            </div>
+            <div class="flex items-center gap-2">
+                {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}"
+                       class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50">
+                        Previous
+                    </a>
+                {% else %}
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-100 text-gray-300 cursor-default">
+                        Previous
+                    </span>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}"
+                       class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-200 bg-white hover:bg-gray-50">
+                        Next
+                    </a>
+                {% else %}
+                    <span class="inline-flex items-center px-3 py-1.5 rounded-md border border-gray-100 text-gray-300 cursor-default">
+                        Next
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="rounded-xl border border-dashed border-gray-300 bg-white px-6 py-10 text-center">
+            <p class="text-base font-medium text-gray-900">No reports yet</p>
+            <p class="mt-1 text-sm text-gray-500">
+                Once you generate reports, they will appear here.
+            </p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}
+

@@ -1,0 +1,21 @@
+{% extends 'fundamentalio/base.html' %}
+
+{% block title %}Report – {{ report.company_name }}{% endblock %}
+
+{% block content %}
+<section class="w-full max-w-4xl mx-auto">
+    <div class="bg-white shadow-xl rounded-3xl border border-gray-200 px-6 py-6 sm:px-10 sm:py-8">
+        <div class="mb-6">
+            <h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">{{ report.company_name }}</h1>
+            <p class="text-sm text-gray-500 mt-1">{{ report.company_symbol }} · {{ report.get_type_display }}</p>
+            <p class="text-sm text-gray-500 mt-1">
+                Created on {{ report.created_at|date:"d-m-Y" }}
+            </p>
+        </div>
+
+        <div class="report-content text-gray-800 text-justify space-y-3 [&_h1]:text-xl [&_h1]:font-semibold [&_h2]:text-lg [&_h2]:font-semibold [&_h3]:text-base [&_h3]:font-semibold [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-0.5 [&_pre]:bg-gray-100 [&_pre]:border [&_pre]:border-gray-200 [&_pre]:rounded-md [&_pre]:p-4 [&_pre]:overflow-x-auto [&_pre]:text-left [&_code]:bg-gray-100 [&_code]:px-1 [&_code]:rounded [&_code]:text-sm [&_code]:text-left [&_table]:text-left [&_th]:text-left [&_td]:text-left [&_img]:rounded-md [&_img]:max-w-full">
+            {{ report_html|safe }}
+        </div>
+    </div>
+</section>
+{% endblock %}

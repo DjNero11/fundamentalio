@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>{% block title %}Welcome{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/fundamentalio_logo.svg' %}" type="image/svg+xml" sizes="any">
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
+    <script defer src="{% static 'js/alpine-3.15.8.min.js' %}"></script>
+</head>
+<body class="font-sans bg-gray-50 text-gray-900 leading-relaxed min-h-screen">
+    <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 px-4 sm:px-8 py-4">
+        <div class="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            <a href="{% url 'fundamentalio:home' %}"
+               class="shrink-0 text-2xl font-semibold tracking-tight text-gray-900 hover:text-gray-700 transition-colors">
+                fundamentalio
+            </a>
+            <div class="flex items-center justify-end gap-2 sm:gap-4 flex-wrap">
+                <a href="{% url 'fundamentalio:search' %}"
+                   class="inline-block px-4 sm:px-6 py-2 text-sm text-gray-700 rounded hover:bg-gray-100 transition-colors">
+                    Search
+                </a>
+                <a href="{% url 'fundamentalio:history' %}"
+                   class="inline-block px-4 sm:px-6 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-600 transition-colors">
+                    History
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="min-h-[calc(100vh-80px)] flex items-center justify-center p-4 sm:p-8">
+        {% if messages %}
+            <div class="fixed inset-x-0 bottom-0 z-50 pointer-events-none p-4 sm:p-6">
+                <div class="w-full max-w-3xl mx-auto space-y-2">
+                    {% for message in messages %}
+                        <div class="relative pointer-events-auto rounded-md px-4 py-3 pr-10 text-sm border shadow-sm
+                            {% if message.tags == 'success' %}
+                                bg-green-50 border-green-200 text-green-800
+                            {% elif message.tags == 'error' %}
+                                bg-red-50 border-red-200 text-red-800
+                            {% else %}
+                                bg-gray-50 border-gray-200 text-gray-800
+                            {% endif %}">
+                            <button
+                                type="button"
+                                class="message-dismiss absolute top-2 right-2 inline-flex items-center justify-center w-6 h-6 rounded text-gray-500 hover:text-gray-700 hover:bg-black/5"
+                                aria-label="Close message"
+                            >
+                                ×
+                            </button>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <script>
+        (function() {
+            document.addEventListener('click', function(e) {
+                const btn = e.target.closest('.message-dismiss');
+                if (!btn) return;
+                const message = btn.closest('.pointer-events-auto');
+                if (message) message.remove();
+            });
+        })();
+    </script>
+</body>
+</html>
