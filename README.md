@@ -294,7 +294,7 @@ venv\Scripts\activate; python manage.py tailwind start
 1. This project is an independent, open-source tool inspired by the investing principles popularized by **Peter Lynch**.
 2. It is not affiliated with, endorsed by, sponsored by, or associated with **Peter Lynch**, **Fidelity Investments**, or any related organization.
 3. All trademarks, names, and references belong to their respective owners and are used for educational and informational purposes only.  
-4. This project uses the [**yfinance**](https://github.com/ranaroussi/yfinance) library. Yahoo! finance API is intended for personal use only.
+4. This project uses the [**yfinance**](https://github.com/ranaroussi/yfinance) library. Yahoo! finance API is intended for personal use only. Go to [yfinance](https://github.com/ranaroussi/yfinance) for more info.
 5. Reports are **AI-generated** and may contain errors or inaccuracies. Always verify information independently before acting on it.
 6. This does not constitute financial, investment, or trading advice. Users are solely responsible for their own investment decisions.
 
