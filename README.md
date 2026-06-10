@@ -248,6 +248,9 @@ venv\Scripts\activate; python manage.py tailwind start
 
 If you find this project useful, please consider starring it — you'll find it quickly later, and it helps others discover it too.
 
+## Quick note  
+This repository contains a simplified and modified version of a production-like project I built while learning web application development.
+
 ## License
 
 Distributed under the **MIT License** — see [`LICENSE`](LICENSE) for details.
