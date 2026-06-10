@@ -79,24 +79,7 @@ After a few months of analyzing his books, iterating on prompts, and building th
 
 Search a company by **name or ticker**, choose a research mode, and receive an **AI-generated report** saved to your history for later review.
 
-```mermaid
-flowchart TD
-    B[🔍 Search Company]:::step
-    B --> C{Choose Mode}:::decision
-
-    C --> D([⚡ Quick Research]):::quick
-    C --> E([🔬 Deep Research]):::deep
-
-    D --> F([📄 Short Report]):::report
-    E --> G([📊 Comprehensive\nReport]):::report
-
-    classDef step    fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
-    classDef decision fill:#fce7f3,stroke:#ec4899,color:#500724
-    classDef quick    fill:#fef9c3,stroke:#eab308,color:#713f12
-    classDef deep     fill:#ede9fe,stroke:#8b5cf6,color:#2e1065
-    classDef report   fill:#dcfce7,stroke:#22c55e,color:#14532d
-```
-<img src="fundamentalio/static/img/graph1.png" width="100%" alt="Search page" /><br />
+<img src="fundamentalio/static/img/New_graph1.png" width="100%" /><br />
 
 ---
 
@@ -110,25 +93,7 @@ Role of a fast screening report is to answer one question: *"Is this stock worth
 | **AI** | Single OpenAI call, medium reasoning effort |
 | **Output** | Short screening report (~300 words) |
 
-```mermaid
-flowchart LR
-    A([🔍 Search\nTicker]):::input --> B[⚡ Quick\nResearch]:::mode
-    B --> C[(Fetched\nFundamentals)]:::data
-
-    subgraph PL["Peter Lynch Methodology Included"]
-        D{OpenAI\nMedium Effort}:::ai
-    end
-
-    C --> D
-    D --> E([📄 Short\nScreening Report]):::output
-
-    classDef input  fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
-    classDef mode   fill:#f3f4f6,stroke:#6b7280,color:#111
-    classDef data   fill:#fef9c3,stroke:#eab308,color:#713f12
-    classDef ai     fill:#fce7f3,stroke:#ec4899,color:#500724
-    classDef output fill:#dcfce7,stroke:#22c55e,color:#14532d
-```
-<img src="fundamentalio/static/img/graph2.png" width="100%" alt="Search page" /><br />
+<img src="fundamentalio/static/img/graph2.png" width="80%" /><br />
 
 Prompts used for **Quick Research:**  
 [Quick Research Core Methodology](fundamentalio/services/research_helpers/quick_research/prompts/quick_research_methodology.md)  
@@ -152,31 +117,7 @@ A comprehensive report designed to deeply understand the stock.
 | **AI** | Single OpenAI call, high reasoning effort |
 | **Output** | Full deep-dive report (10+ pages)|
 
-```mermaid
-flowchart LR
-    A([🔍 Search\nTicker]):::input --> B[🔬 Deep\nResearch]:::mode
-
-    B --> C[📄 Uploaded\nAnnual Report]:::data
-    B --> D[(Fetched\nFundamentals)]:::data
-    B --> E[🌐 Tavily\nWeb Research]:::data
-
-    subgraph PL["Peter Lynch Methodology Included"]
-        F{OpenAI\nHigh Effort}:::ai
-    end
-
-    C --> F
-    D --> F
-    E --> F
-    F --> G([📊 Comprehensive\nDeep-Dive Report]):::output
-
-    classDef input  fill:#dbeafe,stroke:#3b82f6,color:#1e3a5f
-    classDef mode   fill:#f3f4f6,stroke:#6b7280,color:#111
-    classDef step   fill:#ede9fe,stroke:#8b5cf6,color:#2e1065
-    classDef data   fill:#fef9c3,stroke:#eab308,color:#713f12
-    classDef ai     fill:#fce7f3,stroke:#ec4899,color:#500724
-    classDef output fill:#dcfce7,stroke:#22c55e,color:#14532d
-```
-<img src="fundamentalio/static/img/graph3.png" width="100%" alt="Search page" /><br />
+<img src="fundamentalio/static/img/graph3.png" width="100%" /><br />
 
 Prompts used for **Deep Research:**  
 - [Deep Research Core Methodology](fundamentalio/services/research_helpers/deep_research/prompts/deep_research_methodology.md)  
