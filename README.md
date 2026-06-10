@@ -79,7 +79,7 @@ After a few months of analyzing his books, iterating on prompts, and building th
 
 Search a company by **name or ticker**, choose a research mode, and receive an **AI-generated report** saved to your history for later review.
 
-<img src="fundamentalio/static/img/New_graph1.png" width="100%" /><br />
+<img src="fundamentalio/static/img/New_graph1.png" width="80%" /><br />
 
 ---
 
@@ -93,7 +93,7 @@ Role of a fast screening report is to answer one question: *"Is this stock worth
 | **AI** | Single OpenAI call, medium reasoning effort |
 | **Output** | Short screening report (~300 words) |
 
-<img src="fundamentalio/static/img/graph2.png" width="80%" /><br />
+<img src="fundamentalio/static/img/graph2.png" width="100%" /><br />
 
 Prompts used for **Quick Research:**  
 [Quick Research Core Methodology](fundamentalio/services/research_helpers/quick_research/prompts/quick_research_methodology.md)  
