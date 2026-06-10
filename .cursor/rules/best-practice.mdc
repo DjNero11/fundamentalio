@@ -13,7 +13,7 @@ alwaysApply: true
 5. Use Tailwind CSS for styling
 6. Use Alpine.js for UI only when Tailwind CSS cannot handle the logic. Do not use vanilla JS if the same behavior can be expressed cleanly in Alpine.
 7. All pages you create must be fully responsive and mobile friendly.
-8. When you make terminal commands do not forget "source /Users/szymon/Documents/Visual_Studio_Code_Pliki/project/venv/bin/activate"
+8. 
 9. I am a Django beginner. Suggest easier, more maintainable, or more secure approaches when appropriate.
 10. Do not hard-code URLs wherever possible.
 11. Avoid fix-fail loops:
