@@ -96,6 +96,7 @@ flowchart TD
     classDef deep     fill:#ede9fe,stroke:#8b5cf6,color:#2e1065
     classDef report   fill:#dcfce7,stroke:#22c55e,color:#14532d
 ```
+<img src="fundamentalio/static/img/photo1.png" width="100%" alt="Search page" /><br />
 
 ---
 
@@ -127,6 +128,7 @@ flowchart LR
     classDef ai     fill:#fce7f3,stroke:#ec4899,color:#500724
     classDef output fill:#dcfce7,stroke:#22c55e,color:#14532d
 ```
+<img src="fundamentalio/static/img/photo2.png" width="100%" alt="Search page" /><br />
 
 Prompts used for **Quick Research:**  
 [Quick Research Core Methodology](fundamentalio/services/research_helpers/quick_research/prompts/quick_research_methodology.md)  
@@ -174,6 +176,7 @@ flowchart LR
     classDef ai     fill:#fce7f3,stroke:#ec4899,color:#500724
     classDef output fill:#dcfce7,stroke:#22c55e,color:#14532d
 ```
+<img src="fundamentalio/static/img/photo2.png" width="100%" alt="Search page" /><br />
 
 Prompts used for **Deep Research:**  
 - [Deep Research Core Methodology](fundamentalio/services/research_helpers/deep_research/prompts/deep_research_methodology.md)  
